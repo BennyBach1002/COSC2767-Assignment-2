@@ -68,7 +68,7 @@ pipeline {
     post {
         always {
             // Send email notification on every build result
-            mail to: 'your-email@example.com',
+            mail to: 'jackiefabln123@gmail.com',
                  subject: "Build Result: ${currentBuild.fullDisplayName}",
                  body: "The build finished with status: ${currentBuild.result}. View details at ${env.BUILD_URL}"
         }
