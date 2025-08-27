@@ -1,0 +1,72 @@
+// Jenkinsfile for individual learning and testing
+pipeline {
+    agent any
+
+    environment {
+        // Define a variable for the image tag
+        IMAGE_TAG = "v${env.BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Get the code from your repository
+                git url: 'https://github.com/BennyBach1002/COSC2767-Assignment-2', branch: 'Ben'
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    // Build the frontend and backend images
+                    sh "docker build -t frontend-app:${IMAGE_TAG} ./client"
+                    sh "docker build -t backend-app:${IMAGE_TAG} ./server"
+                }
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                script {
+                    // Run tests inside a container to ensure consistency
+                    sh "docker run --rm -v $(pwd)/client:/app -w /app node:18-alpine sh -c 'npm install && npm test'"
+                    sh "docker run --rm -v $(pwd)/server:/app -w /app node:18-alpine sh -c 'npm install && npm test'"
+                }
+            }
+        }
+
+        stage('Run Integration Tests') {
+            steps {
+                script {
+                    // Use docker-compose to bring up the full stack for testing
+                    sh "docker-compose -f infra/compose/staging/docker-compose.yml up --build -d"
+                    // Wait for services to be ready before testing
+                    sh "sleep 20"
+                    // Run a test that checks the API connection (e.g., getting products)
+                    sh "docker exec $(docker-compose -f infra/compose/staging/docker-compose.yml ps -q backend) npm run test:integration"
+                    // Clean up the containers
+                    sh "docker-compose -f infra/compose/staging/docker-compose.yml down"
+                }
+            }
+        }
+
+        stage('Run Application') {
+            steps {
+                script {
+                    // Run the application to see if it starts up successfully
+                    echo "Application is being deployed for a quick check. Check the logs for success messages."
+                    sh "docker-compose -f infra/compose/staging/docker-compose.yml up -d"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Send email notification on every build result
+            mail to: 'your-email@example.com',
+                 subject: "Build Result: ${currentBuild.fullDisplayName}",
+                 body: "The build finished with status: ${currentBuild.result}. View details at ${env.BUILD_URL}"
+        }
+    }
+}
