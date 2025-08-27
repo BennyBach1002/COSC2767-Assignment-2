@@ -39,13 +39,15 @@ pipeline {
             steps {
                 script {
                     // Use docker-compose to bring up the full stack for testing
-                    sh "docker-compose -f infra/compose/staging/docker-compose.yml up --build -d"
+                    // Use single quotes here
+                    sh 'docker-compose -f infra/compose/staging/docker-compose.yml up --build -d'
                     // Wait for services to be ready before testing
-                    sh "sleep 20"
+                    sh 'sleep 20'
                     // Run a test that checks the API connection (e.g., getting products)
-                    sh "docker exec $(docker-compose -f infra/compose/staging/docker-compose.yml ps -q backend) npm run test:integration"
+                    // The command is now in single quotes
+                    sh 'docker exec $(docker-compose -f infra/compose/staging/docker-compose.yml ps -q backend) npm run test:integration'
                     // Clean up the containers
-                    sh "docker-compose -f infra/compose/staging/docker-compose.yml down"
+                    sh 'docker-compose -f infra/compose/staging/docker-compose.yml down'
                 }
             }
         }
@@ -55,7 +57,8 @@ pipeline {
                 script {
                     // Run the application to see if it starts up successfully
                     echo "Application is being deployed for a quick check. Check the logs for success messages."
-                    sh "docker-compose -f infra/compose/staging/docker-compose.yml up -d"
+                    // The command is now in single quotes
+                    sh 'docker-compose -f infra/compose/staging/docker-compose.yml up -d'
                 }
             }
         }
