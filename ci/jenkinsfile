@@ -11,13 +11,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'Ben', url: 'https://github.com/BennyBach1002/COSC2767-Assignment-2/tree/Bent'
+                git branch: 'Ben', url: 'https://github.com/BennyBach1002/COSC2767-Assignment-2/tree/Ben'
             }
         }
 
         stage('SSH into Docker EC2 and Run Command') {
             steps {
                 // The sshagent step injects the private key into the SSH agent for this block
+                ehco "start testing "
                 sshagent(credentials: [SSH_CREDENTIAL_ID]) {
                     sh """
                         # The 'ssh' command will now use the key from the agent for authentication
