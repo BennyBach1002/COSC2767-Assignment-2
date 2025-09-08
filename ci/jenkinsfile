@@ -17,23 +17,19 @@ pipeline {
 
         stage('SSH into Docker EC2 and Run Command') {
             steps {
-                // The sshagent step injects the private key into the SSH agent for this block
-                echo 'start testing '
+                echo 'start testing'
                 sshagent(credentials: [SSH_CREDENTIAL_ID]) {
                     sh """
-                        # The 'ssh' command will now use the key from the agent for authentication
-                        # -o StrictHostKeyChecking=no is used to bypass the host key check for the first connection
-                        # 'ec2-user' is the default username for Amazon Linux instances
-                        ssh -o StrictHostKeyChecking=no ec2-user@${DOCKER_EC2_IP} "
-                            # Remove any existing container named 'testing' to avoid conflicts
-                            if docker ps -a --format '{{.Names}}' | grep -q 'testing'; then
-                                echo 'Removing existing container: testing'
-                                docker rm -f testing
-                            fi
-                            # Pull a sample image and create a new container named 'testing'
-                            docker run -d --name testing nginx:alpine
-                        "
-                    """
+                ssh -o StrictHostKeyChecking=no dockeradmin@${DOCKER_EC2_IP} "
+                    # Remove any existing container named 'testing'
+                    if docker ps -a --format '{{.Names}}' | grep -q 'testing'; then
+                        echo 'Removing existing container: testing'
+                        docker rm -f testing
+                    fi
+                    # Create the new container as the dockeradmin user
+                    docker run -d --name testing nginx:alpine
+                "
+            """
                 }
             }
         }
