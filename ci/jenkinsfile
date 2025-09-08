@@ -18,7 +18,7 @@ pipeline {
         stage('SSH into Docker EC2 and Run Command') {
             steps {
                 // The sshagent step injects the private key into the SSH agent for this block
-                ehco 'start testing '
+                echo 'start testing '
                 sshagent(credentials: [SSH_CREDENTIAL_ID]) {
                     sh """
                         # The 'ssh' command will now use the key from the agent for authentication
