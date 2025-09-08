@@ -20,7 +20,7 @@ pipeline {
                 echo 'start testing'
                 sshagent(credentials: [SSH_CREDENTIAL_ID]) {
                     sh """
-                ssh -o StrictHostKeyChecking=no dockeradmin@${DOCKER_EC2_IP} "
+                ssh -o StrictHostKeyChecking=no ec2-user@${DOCKER_EC2_IP} "
                     # Remove any existing container named 'testing'
                     if docker ps -a --format '{{.Names}}' | grep -q 'testing'; then
                         echo 'Removing existing container: testing'
