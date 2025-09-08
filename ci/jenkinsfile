@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'Ben', url: 'https://github.com/BennyBach1002/COSC2767-Assignment-2.git'
+                git branch: 'Ben', url: 'https://github.com/BennyBach1002/COSC2767-Assignment-2/tree/Bent'
             }
         }
 
