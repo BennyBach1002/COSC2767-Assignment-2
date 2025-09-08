@@ -24,7 +24,15 @@ pipeline {
                         # The 'ssh' command will now use the key from the agent for authentication
                         # -o StrictHostKeyChecking=no is used to bypass the host key check for the first connection
                         # 'ec2-user' is the default username for Amazon Linux instances
-                        ssh -o StrictHostKeyChecking=no ec2-user@${DOCKER_EC2_IP} "echo 'Hello from Jenkins! This is a test command.'"
+                        ssh -o StrictHostKeyChecking=no ec2-user@${DOCKER_EC2_IP} "
+                            # Remove any existing container named 'testing' to avoid conflicts
+                            if docker ps -a --format '{{.Names}}' | grep -q 'testing'; then
+                                echo 'Removing existing container: testing'
+                                docker rm -f testing
+                            fi
+                            # Pull a sample image and create a new container named 'testing'
+                            docker run -d --name testing nginx:alpine
+                        "
                     """
                 }
             }
