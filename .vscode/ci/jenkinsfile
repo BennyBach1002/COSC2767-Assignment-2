@@ -1,0 +1,47 @@
+pipeline {
+    // The agent specifies where the pipeline will run. 'any' means it can run on any available agent.
+    agent any
+
+    // Environment variables that will be available throughout the pipeline.
+    environment {
+        // Example for a version tag
+        IMAGE_TAG = "v1.0.${BUILD_NUMBER}"
+        // Example for a remote server IP (should be a Jenkins credential in a real project)
+        ANSIBLE_SERVER_IP = '123.456.789.10'
+        // Example for a playbook path
+        PLAYBOOK_PATH = 'ansible/deploy.yml'
+    }
+
+    // Options for the pipeline, such as setting a timeout.
+    options {
+        timeout(time: 1, unit: 'HOURS')
+    }
+
+    // The stages block defines the main sections of your pipeline.
+    stages {
+
+        // Stage 1: Checkout the code from your repository.
+        stage('Checkout') {
+            steps {
+                // The git step checks out the code. It automatically gets the URL from the job configuration.
+                git branch: 'main', url: 'https://github.com/your-username/your-repository.git'
+            }
+        }
+    }
+}
+    // The post block defines actions that run at the end of the pipeline.
+    post {
+        // Always run this step, regardless of the pipeline result.
+        always {
+            echo 'Pipeline finished.'
+        }
+        // Run this step if the pipeline fails.
+        failure {
+            echo 'Pipeline failed!'
+        }
+        // Run this step if the pipeline succeeds.
+        success {
+            echo 'Pipeline succeeded!'
+        }
+    }
+}
